@@ -10,7 +10,7 @@ Sites создаёт персональный плагин при публика
 
 Проверка: попроси вызвать `atlas_get_context`, затем `atlas_search` с запросом `видео`. Ответ должен содержать твой контекст и карточки. Не считай наличие ссылки или установленного skill подтверждением доступа к базе.
 
-## Claude
+## Claude Desktop
 
 Адрес удалённого Streamable HTTP MCP:
 
@@ -18,13 +18,11 @@ Sites создаёт персональный плагин при публика
 https://tool-atlas-kb-oct22.chicguppy1.chatgpt.site/mcp
 ```
 
-Для Claude Code:
+В Claude Desktop открой **Customize → Connectors → Add custom connector**. Назови его Atlas, вставь опубликованный MCP-адрес, затем пройди вход в аккаунт с доступом к базе. В новом разговоре включи Atlas через **+ → Connectors**. Настройки удалённых коннекторов общие с claude.ai. Локальный адрес localhost для этого режима не подходит.
 
-```sh
-claude mcp add --transport http --scope user atlas https://tool-atlas-kb-oct22.chicguppy1.chatgpt.site/mcp
-```
+Попроси Claude вызвать `atlas_get_context` и `atlas_search`. Только успешный ответ с твоими данными подтверждает подключение. Вход в сайт сам по себе его не подтверждает. OAuth необходимо проверить в реальном клиенте; не делай личную базу публичной для обхода авторизации.
 
-Затем открой `/mcp` и пройди авторизацию. В Claude с интерфейсом удалённых коннекторов добавь этот же URL. Вход выполняется в аккаунт с доступом к приватному Атласу. Реальная совместимость OAuth проверяется в клиенте; поддержка MCP на сервере сама по себе не подтверждает, что Claude уже подключён. Если OAuth не проходит, не делай сайт публичным: используй экспорт как снимок до настройки совместимого подключения.
+Официальные инструкции: [подключение remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp), [требования к OAuth](https://claude.com/docs/connectors/building/authentication).
 
 Сервер поддерживает `server/discover`, `initialize`, `tools/list`, `tools/call`, `ping` и уведомления инициализации. Он работает без сессий по HTTP POST, отвечает JSON и не предоставляет SSE-поток.
 
@@ -65,3 +63,9 @@ claude mcp add --transport http --scope user atlas https://tool-atlas-kb-oct22.c
 - [Claude Code: skills](https://code.claude.com/docs/en/skills)
 
 Эти страницы описывают возможности клиентов. Успешный вход конкретного пользователя следует подтверждать отдельным вызовом инструмента.
+
+## Проекты, решения и обновления
+
+`atlas_get_context` возвращает рабочий контекст и отдельные проекты. `atlas_search` принимает `projectId` и `mode: "topics"` для поиска по темам с объяснением совпадений. Это словарь русских и английских тем, без embeddings и внешнего LLM API.
+
+`atlas_enrich_resource` сохраняет предложение в `pendingUpdate`, не заменяя текущее описание. Открой «От агентов», сравни поля, прими или отклони изменения и сохрани карточку. Личные решения, опыт и проекты агент этим инструментом не изменяет.

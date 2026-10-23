@@ -1,5 +1,5 @@
 import { seed, type Entry } from '../app/data';
-import { canonicalUrl, entrySchema, contextSchema, emptyContext } from './atlas-schema';
+import { canonicalUrl, entrySchema, contextSchema, emptyContext, projectSchema, enrichmentSchema, type AtlasProject } from './atlas-schema';
 
 export class AtlasError extends Error {constructor(message:string,public status=400){super(message);}}
 export async function readEntries(db:D1Database,owner:string):Promise<Entry[]> {
@@ -10,6 +10,8 @@ export async function readEntries(db:D1Database,owner:string):Promise<Entry[]> {
 }
 export async function writeEntry(db:D1Database,owner:string,input:unknown):Promise<Entry> {
  const entry=entrySchema.parse(input),key=canonicalUrl(entry.url);
+ if(entry.pendingUpdate){entry.pendingUpdate.patch=enrichmentSchema.parse(entry.pendingUpdate.patch);}
+ if(entry.projectIds?.length){const projects=await readProjects(db,owner);if(entry.projectIds.some(id=>!projects.some(p=>p.id===id)))throw new AtlasError('Выбранный проект не найден в твоём аккаунте.');}
  const current=await readEntries(db,owner);
  if(current.some(e=>e.id!==entry.id&&canonicalUrl(e.url)===key))throw new AtlasError('Эта ссылка уже есть в Атласе.',409);
  const previous=current.find(e=>e.id===entry.id);
@@ -27,6 +29,18 @@ export async function writeEntry(db:D1Database,owner:string,input:unknown):Promi
  }
  if(!result.meta.changes)throw new AtlasError('Карточка или ссылка уже изменена. Обнови базу.',409);
  return saved;
+}
+export async function readProjects(db:D1Database,owner:string):Promise<AtlasProject[]> {
+ const rows=await db.prepare('SELECT data,revision FROM atlas_projects WHERE owner=?').bind(owner).all<{data:string;revision:number}>();
+ return rows.results.map(r=>projectSchema.parse({...JSON.parse(r.data),revision:r.revision}));
+}
+export async function writeProject(db:D1Database,owner:string,input:unknown){
+ const project=projectSchema.parse(input),next={...project,revision:project.revision+1};
+ const result=project.revision===0
+ ?await db.prepare('INSERT INTO atlas_projects(owner,id,data,revision) VALUES(?,?,?,1) ON CONFLICT DO NOTHING').bind(owner,project.id,JSON.stringify(next)).run()
+ :await db.prepare('UPDATE atlas_projects SET data=?,revision=? WHERE owner=? AND id=? AND revision=?').bind(JSON.stringify(next),next.revision,owner,project.id,project.revision).run();
+ if(!result.meta.changes)throw new AtlasError('Проект изменён в другом окне. Обнови данные перед сохранением.',409);
+ return next;
 }
 export async function readContext(db:D1Database,owner:string) {
  const row=await db.prepare('SELECT data,revision FROM atlas_contexts WHERE owner=?').bind(owner).first<{data:string;revision:number}>();

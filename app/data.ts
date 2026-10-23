@@ -6,6 +6,11 @@ export type Entry = {
  sources:{label:string;url:string}[]; notes:string; status:string; favorite:boolean; revision:number;
  relevance?: {horizon:'Сейчас'|'Скоро'|'На будущее'|'Прототип';project:string;reason:string};
  addedBy?:string; addedAt?:string;
+ projectIds?:string[];
+ evidence?:{basis:'Документация'|'Опыт пользователя'|'Гипотеза';detail:string;date:string};
+ review?:{decision:'Принято'|'Позже'|'Не подходит';reason:string;date:string};
+ experience?:{task:string;result:string;alternatives:string;lesson:string};
+ pendingUpdate?:{patch:Record<string,unknown>;original:Record<string,unknown>;date:string};
 };
 const defaults = {notes:'',status:'В коллекции',favorite:false,revision:0,checked:'2026-10-22',license:'MIT'};
 export const seed: Entry[] = [

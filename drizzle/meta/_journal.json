@@ -15,6 +15,13 @@
       "when": 1792752089516,
       "tag": "0001_talented_post",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1792772242700,
+      "tag": "0002_fancy_barracuda",
+      "breakpoints": true
     }
   ]
 }

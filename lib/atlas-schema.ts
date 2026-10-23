@@ -8,14 +8,21 @@ const url = z.string().url().max(2000).refine(value => {
  try { const parsed = new URL(value); return ['http:', 'https:'].includes(parsed.protocol) && !parsed.username && !parsed.password; } catch { return false; }
 }, 'Нужна ссылка http(s) без логина и пароля.');
 export const relevanceSchema = z.object({horizon:z.enum(horizons),project:short,reason:z.string().max(3000)});
+export const evidenceSchema=z.object({basis:z.enum(['Документация','Опыт пользователя','Гипотеза']),detail:z.string().max(3000),date:short});
+export const projectSchema=z.object({id:z.string().regex(/^[a-zA-Z0-9_-]{1,100}$/),name:short.min(1),goal:z.string().max(5000),stack:z.string().max(3000),constraints:z.string().max(5000),stage:z.enum(['Идея','Проектирование','Разработка','Запущен','Архив']),questions:z.string().max(5000),revision:z.number().int().min(0)});
+export type AtlasProject=z.infer<typeof projectSchema>;
 export const entrySchema = z.object({
  id:z.string().regex(/^[a-zA-Z0-9_-]{1,100}$/),name:short.min(1),url,type:z.enum(resourceTypes),category:short.min(1),
  summary:z.string().max(2000),tags:z.array(short).max(30),use:z.string().max(10000),needs:z.string().max(10000),
  limits:z.string().max(10000),start:z.string().max(15000),platform:short,cost:z.string().max(2000),license:short,checked:short,
  sources:z.array(z.object({label:short,url})).max(20),notes:z.string().max(20000),status:z.enum(resourceStatuses),
  favorite:z.boolean(),revision:z.number().int().min(0),relevance:relevanceSchema.optional(),addedBy:short.optional(),addedAt:short.optional(),
+ projectIds:z.array(z.string().max(100)).max(30).optional(),evidence:evidenceSchema.optional(),
+ review:z.object({decision:z.enum(['Принято','Позже','Не подходит']),reason:z.string().max(3000),date:short}).optional(),
+ experience:z.object({task:z.string().max(5000),result:z.string().max(5000),alternatives:z.string().max(5000),lesson:z.string().max(5000)}).optional(),
+ pendingUpdate:z.object({patch:z.record(z.unknown()),original:z.record(z.unknown()),date:short}).optional(),
 });
-export const proposalSchema = entrySchema.omit({id:true,notes:true,status:true,favorite:true,revision:true,addedBy:true,addedAt:true}).extend({
+export const proposalSchema = entrySchema.omit({id:true,notes:true,status:true,favorite:true,revision:true,addedBy:true,addedAt:true,review:true,experience:true,pendingUpdate:true,evidence:true,projectIds:true}).extend({
  summary:z.string().min(10).max(2000),
  sources:z.array(z.object({label:short.min(1),url})).min(1).max(20),
  checked:z.string().regex(/^\d{4}-\d{2}-\d{2}$/),

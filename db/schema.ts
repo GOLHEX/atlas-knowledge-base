@@ -6,3 +6,6 @@ export const entries = sqliteTable('entries', {
 export const atlasContexts = sqliteTable('atlas_contexts', {
  owner: text('owner').primaryKey(), data: text('data').notNull(), revision: integer('revision').notNull().default(1),
 });
+export const atlasProjects=sqliteTable('atlas_projects',{
+ owner:text('owner').notNull(),id:text('id').notNull(),data:text('data').notNull(),revision:integer('revision').notNull().default(1),
+},table=>[primaryKey({columns:[table.owner,table.id]})]);
