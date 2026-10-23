@@ -1,133 +1,136 @@
-# vinext-starter
+# Атлас инструментов
 
-A clean full-stack starter running on [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and Drizzle support.
+Личная база знаний о GitHub-проектах, навыках AI-агентов, библиотеках и онлайн-сервисах. Помогает сохранить полезную находку вместе с контекстом: какую задачу она решает, что нужно для запуска, какие есть ограничения и когда к ней стоит вернуться.
 
-## Prerequisites
+**Идея:** превращать поток ссылок в коллекцию, с которой удобно работать человеку и AI-агенту.
 
-- Node.js `>=22.13.0`
-- Portable: Windows, macOS, or Linux; no Bash required
-- Managed Linux: managed Linux runtime with Bash, `flock`, `curl`, `sha256sum`, and GNU `timeout`
-- Git and `tar` (including Windows `tar.exe`) are required for publishing; portable publication does not require Bash
+[Открыть базу](https://tool-atlas-kb-oct22.chicguppy1.chatgpt.site/) · [Работа с AI-агентом](docs/AI-WORKFLOW.md) · [Устройство среды](docs/RUNTIME.md)
 
-## Sites Lifecycle
+Опубликованный сайт приватный: доступ определяется настройками Sites. Доступ к GitHub-репозиторию выдаётся отдельно.
 
-The Sites initializer copies the shared starter and selects managed-linux only when `SITES_MANAGED_LINUX_CONTAINER=1`; otherwise it selects portable. It saves the selection only in ignored `.sites-runtime/execution-profile.json`. Both profiles copy/configure first, then use the plugin's separate `install-dependencies.mjs` step to measure installation independently. Edit source under `app/` and follow the Sites skill for installation, preview, builds, and publishing.
+## Возможности
 
-Run `node <plugin-root>/scripts/configure-execution-profile.mjs` only when the profile is unknown for the current checkout and environment. Profile changes do not alter tracked source or require reinstalling otherwise-valid dependencies; restart an existing preview to use the new selection. Do not commit or upload `.sites-runtime/`.
+| Возможность | Зачем нужна |
+| --- | --- |
+| Визуальные карточки | Быстро просмотреть коллекцию и открыть подробности |
+| Поиск по названию, описанию, тегам и заметкам | Найти инструмент по задаче; поддерживается простой транслит, например `uderzhanie` |
+| Фильтры по направлению, типу и статусу | Отделить навыки от приложений, библиотек и сервисов |
+| Избранное и сортировка | Держать часто используемые инструменты под рукой |
+| Статусы | Вести путь «В коллекции» → «Хочу попробовать» → «Использую»; убирать лишнее в «Архив» |
+| Подробная карточка | Сохранить назначение, требования, платформу, стоимость, лицензию, ограничения и первые шаги |
+| Источники и дата проверки | Вернуться к первоисточнику и понять, когда описание проверяли |
+| Личные заметки и редактирование | Записать собственный опыт и дополнить описание |
+| Добавление ресурсов | Расширять каталог через интерфейс или исходные данные |
+| JSON-экспорт и импорт | Сохранять копию коллекции и добавлять отсутствующие карточки |
+| Сценарии работы | Рассматривать несколько инструментов как этапы одной задачи |
+| Сохранение в аккаунте | Возвращаться к карточкам, статусам и заметкам при следующем посещении |
 
-This starter does not use `wrangler.jsonc`.
+Одновременное изменение карточки в двух окнах обнаруживается по номеру ревизии: сервер возвращает конфликт, чтобы не затереть изменения молча. Архив скрыт из обычной выдачи и доступен через фильтр статуса.
 
-Publish archives outside the source checkout or under its ignored `outputs/` directory. Local `.env*`, `.dev.vars*`, TypeScript build state, and tool runtime directories are ignored; keep the hosting manifest, migrations, and authored scripts in source control.
+## Почему особенно полезно вместе с AI-агентом
 
-`install:ci` runs `npm ci` once against the shared lockfile, disables parent-workspace discovery, and includes required dev/optional dependencies despite production/omit settings. Sharp defaults to prebuilt binaries unless explicitly configured otherwise. Do not overlap installers.
+Атлас даёт агенту постоянный, структурированный контекст. Агент с доступом к репозиторию может прочитать каталог, изучить новые ссылки, сравнить варианты и подготовить изменения, которые легко проверить через Git diff.
 
-- **Portable:** Preserve host HOME, npm cache, registry, proxy, temporary paths, retry/concurrency settings, and lifecycle-script policy. Use `--prefer-offline --no-audit --no-fund`.
-- **Managed Linux:** Use the existing project-local HOME/cache/tmp setup and Linux install lock, tarball preflight, and timeout. Restore the image-seeded npm cache only when its lockfile hash matches; retain network fallback. Builds keep their existing timeout. These helpers are not invoked by the portable profile.
+| Польза | Пример |
+| --- | --- |
+| Меньше повторного поиска | «Что из моей коллекции подходит для монтажа видео в браузере?» |
+| Меньше повторных объяснений | Требования и ограничения уже записаны в карточках |
+| Более осознанный выбор | Сравнение инструментов под конкретную среду, бюджет и задачу |
+| Пополнение в одном формате | Новая ссылка получает описание, теги, источники и дату проверки |
+| Связь инструментов с задачами | Последовательность исследования, сценария и сборки ролика |
+| Проверяемые изменения | Видно, какие факты добавлены и на каких источниках основаны |
+| Накопление собственного опыта | Переданные агенту заметки помогают учитывать прошлые попытки |
 
-`scripts/sites-env.mjs` preserves the caller's HOME, npm cache, proxy, XDG, and temporary-directory configuration while defaulting Wrangler and Miniflare state to the checkout. If npm reports an unwritable cache, select a writable path with `npm_config_cache` for that install. The `dev` and `start` scripts also keep Wrangler logs inside the checkout. Generated `.sites-runtime/` and `.wrangler/` directories are disposable and ignored by Git.
+В интерфейсе пока нет встроенного AI-чата, семантического поиска или автоматического обновления GitHub-данных. Агент работает с каталогом через репозиторий, предоставленный экспорт либо доступный ему авторизованный интерфейс. Одного доступа к GitHub недостаточно для чтения личных заметок из базы сайта.
 
-On portable, `npm run dev` uses `vinext dev` with HMR, starting at port 5173. Vinext records the running server in ignored `.vinext/` state, rejects an ordinary duplicate launch, and recovers stale state after a stopped process; exactly simultaneous starts can race. Pass `--port <port>` or `--hostname <host>` after `npm run dev --` when needed; keep portable previews on loopback.
+Для самого Атласа не нужен ключ LLM-провайдера. Доступ к внешнему агенту, моделям, хостингу и инструментам оплачивается по условиям соответствующих сервисов.
 
-For browser QA on managed Linux, use `sites-preview start`. The project's dev script runs Vite and accepts the supervisor's `--host 0.0.0.0 --port 4173 --strictPort` arguments. The internal browser uses `http://terminal.local:4173/`; it is not a user-facing URL. The supervisor owns the preview lifecycle. The ignored local profile survives the supervisor's cleared process environment.
+**Пример запроса агенту:**
 
-The portable profile simulates ChatGPT sign-in only for loopback development requests. Visit `/signin-with-chatgpt?return_to=/` to sign in as `local_seedy` (`seedy@sites.test`, display name `Seedy`) and `/signout-with-chatgpt?return_to=/` to sign out. The development cookie preserves that identity across server restarts. Mock auth is disabled in the managed-linux profile and is not included in production builds; hosted authentication remains dispatch-owned.
+> Изучи README и docs/AI-WORKFLOW.md. Добавь эти ссылки в каталог: [...]. Проверь официальные источники, опиши назначение, требования, ограничения и стоимость. Не меняй существующие ID и личные заметки. Покажи изменения и результаты проверки.
 
-The Worker uses `vinext/server/fetch-handler`, including Vinext's config-aware image handling. After building, `npm start` runs that Worker locally through Wrangler on `127.0.0.1`, sharing `.wrangler/state` with dev preview and local D1 migrations; it does not deploy the site or simulate sign-in. Use the URL printed by the server. Pass `npm start -- --port <port>` to select a different built-preview port.
+## Начальная коллекция
 
-Local previews use Miniflare's placeholder `Request.cf` metadata without a network lookup. Set `CLOUDFLARE_CF_FETCH_ENABLED=true` to opt into fetching preview metadata; this setting does not change hosted request metadata.
+В репозитории 14 исходных карточек. Описания проверялись по источникам 22–23 октября 2026 года; наличие карточки не означает, что инструмент установлен или протестирован.
 
-Local tool usage metrics are disabled by default. Set `WRANGLER_SEND_METRICS=true` to opt in.
+| Направление | Ресурсы |
+| --- | --- |
+| AI-агенты и навыки | Hermes Agent, Everything Claude Code (ECC) |
+| Видео, контент и исследования | MoneyPrinterTurbo, YouTube Agent Skill, Cheat on Content, Social Media Research Skills |
+| Карты и миры | Inkarnate, Azgaar's Fantasy Map Generator |
+| Облако и серверы | Puter, OpenTrashmail |
+| Разработка и локальные инструменты | Portpal, Colibri, ffmpeg.wasm, WebVM |
 
-## Included Shape
+Ссылки и подробные описания находятся в `app/data.ts` и `app/additional.ts`. Таблица группирует коллекцию для обзора; фильтры интерфейса используют категории самих карточек.
 
-- edit site code under `app/`
-- `app/chatgpt-auth.ts` provides optional dispatch-owned ChatGPT sign-in helpers
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `worker/index.ts` is the production Worker entrypoint and preserves request-scoped connector bindings
-- `scripts/vite/` contains the maintained Vite integrations and the vendored Sites plugin license
-- `scripts/connector-preview/` contains the local connector preview Worker and session helpers
-- the remaining `scripts/` files select execution profiles and run installation, development, and builds; the plugin's helpers orchestrate the Sites lifecycle
-- `dist/` contains generated deployment output; `.vinext/`, `.wrangler/`, and `.sites-runtime/` contain ignored local tool state
-- `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
-- `db/schema.ts` starts intentionally empty
-- `@cloudflare/workers-types` provides Worker types; `cloudflare-env.d.ts` declares optional `DB`/`BUCKET` bindings—update these declarations if binding names change
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+## Как устроены данные
 
-## Workspace Auth Headers
-
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
-
-The user ID is stable for the same user on the same Site and different across Sites. Use it as the durable user key; use email and name for display or contact purposes.
-
-SIWC-authenticated workspace sites may also receive `oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty `name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by `oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const userId = requestHeaders.get("oai-authenticated-user-id");
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```mermaid
+flowchart LR
+    A[Исходный каталог в GitHub] --> C[API Атласа]
+    B[Личные записи в D1] --> C
+    C --> D[Поиск и карточки в браузере]
+    D -->|Сохранение| B
+    D --> E[JSON-экспорт пользователя]
+    F[AI-агент с доступом к репозиторию] -->|Проверенные изменения| A
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+Сервер объединяет исходный каталог с пользовательскими записями в Cloudflare D1, привязанными к ID вошедшего пользователя. Сохранённая пользовательская версия карточки имеет приоритет. Поэтому изменение исходного описания не перезапишет уже отредактированную личную карточку.
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs optional or required ChatGPT sign-in:
+**Репозиторий содержит код и начальную коллекцию. Личные заметки и изменения из работающего сайта в Git автоматически не попадают.** Для копии текущей коллекции используй «Экспорт JSON» на сайте. Импорт добавляет отсутствующие карточки и пропускает совпадения по ID или URL; это не восстановление поверх существующих записей. Лимит — 5 МБ и 500 карточек; при ошибке уже добавленные карточки сохраняются.
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use the returned `userId` as the stable user key for user-owned records; do not use email as a durable identifier.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send anonymous visitors through Sign in with ChatGPT.
-- In a Server Component, start sign-in with `<a href={chatGPTSignInPath(returnTo)} target="_top">`. The auth helper module is server-only; do not import it into a Client Component.
-- Do not use `fetch`, XHR, a client-side router, or a framework link that can prefetch the sign-in route. SIWC must start as a top-level navigation.
-- Never request the AuthAPI authorization endpoint directly. The dispatch-owned `/signin-with-chatgpt` route must start the SIWC flow.
-- Use `chatGPTSignOutPath(returnTo)` for browser sign-out links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because they depend on per-request identity headers.
+## Локальный запуск
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the OAuth cookies, and identity header injection. Do not implement app routes for those reserved paths. Routes that do not import and call the helper remain anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the Sites hosting platform's access policy controls for workspace-wide restrictions, or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Local D1 migrations
-
-For a D1-backed local preview, generate SQL with `npm run db:generate`. Build once through the Sites skill's build entrypoint (or `npm run build` for standalone use) to generate `dist/server/wrangler.json`, rebuilding if bindings change. From the project root, apply each pending migration in order:
+Нужны Git и Node.js **22.13.0 или новее**. Команды выполняются из корня проекта и подходят для PowerShell и оболочки WSL/Linux.
 
 ```sh
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_example.sql
+git clone https://github.com/GOLHEX/atlas-knowledge-base.git
+cd atlas-knowledge-base
+npm run install:ci
+npm run build
 ```
 
-Replace the filename with the pending migration and `DB` with your D1 binding name if different. Use `.wrangler/state`, not `.wrangler/state/v3`; Wrangler adds the versioned directories. Do not replay migrations already applied locally. This updates only the preview database; publishing applies production migrations separately.
+После первой сборки создай таблицу в **локальной** базе. Миграцию нужно применить один раз для новой локальной базы:
 
-## Diagnostic Commands
+```sh
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_brown_phalanx.sql
+npm run dev -- --hostname 127.0.0.1
+```
 
-- `npm run install:ci`: perform the one locked dependency install
-- `npm run dev`: start the Vite/Vinext development server
-- `npm run build`: build the deployable Sites artifact
-- `npm run start`: preview the built Worker locally with D1/R2 support
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+Открой адрес, который напечатает сервер, обычно `http://127.0.0.1:5173`. Для локального тестового входа перейди на `/signin-with-chatgpt?return_to=/`. Эмуляция входа предназначена только для разработки на loopback-адресе. Локальная база независима от опубликованной.
 
-When using the Sites plugin, follow its skill instructions for installation, builds, and publishing. These npm commands remain available for standalone use.
+Проверки перед отправкой изменений:
 
-The portable build runs Vinext directly without a host `timeout` command. The managed-linux build uses `scripts/build-verified.sh` and its existing `SITES_BUILD_TIMEOUT` setting.
+```sh
+node node_modules/typescript/bin/tsc --noEmit
+node scripts/run-framework.mjs build
+git diff --check
+```
 
-## Learn More
+Если PowerShell блокирует `npm.ps1`, используй `npm.cmd`. Подробности среды, профилей запуска и авторизации — в [docs/RUNTIME.md](docs/RUNTIME.md).
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+## Структура проекта
+
+| Путь | Содержимое |
+| --- | --- |
+| `app/atlas.tsx`, `app/globals.css` | Интерфейс и оформление |
+| `app/data.ts`, `app/additional.ts` | Тип карточки и исходный каталог |
+| `app/api/entries/route.ts` | Чтение, валидация и сохранение карточек |
+| `app/chatgpt-auth.ts` | Интеграция с авторизацией Sites |
+| `db/`, `drizzle/` | Схема данных и миграции |
+| `worker/`, `vite.config.ts`, `scripts/` | Среда выполнения и сборка |
+| `.openai/hosting.json` | Привязка к существующему проекту Sites и D1 |
+| `ATLAS-MAINTENANCE.md` | Правила обслуживания действующего сайта |
+| `export-baseline.mjs` | Экспорт начального каталога в JSON и Markdown |
+
+Стек: React 19, TypeScript, Vinext/Vite, Cloudflare Workers, D1 и Drizzle. `node export-baseline.mjs` записывает начальный каталог в соседнюю с проектом папку `../outputs/`; он не читает личные записи из D1 и не заменяет экспорт через сайт.
+
+## Публикация и границы текущей версии
+
+- GitHub хранит исходники и историю. Push сам по себе не обновляет опубликованный сайт: автоматический деплой из GitHub не настроен.
+- Действующий сайт публикуется через Sites. При обновлении нужно сохранять идентификатор проекта, настройки приватности и отдельно применять новые миграции базы.
+- Для размещения вне Sites потребуются настройка D1 и адаптация авторизации с доверенной серверной проверкой личности. Это приложение не является статическим сайтом для GitHub Pages.
+- Сценарии показывают возможные сочетания инструментов. Автоматические интеграции между ними не реализованы.
+- Каталог не устанавливает перечисленные приложения и навыки. Совместимость, лицензии и тарифы следует перепроверять перед применением.
+
+Лицензии сторонних компонентов сохранены в `vendor/` и `scripts/vite/`. Лицензии ресурсов каталога не определяют лицензию самого Атласа; отдельная лицензия на код Атласа пока не выбрана.
