@@ -13,3 +13,5 @@ Use the Sites skill for subsequent source updates and private publication. Prese
 
 Local auth simulation: /signin-with-chatgpt?return_to=/
 Generate schema changes with drizzle-kit; do not edit applied migrations. Local and hosted databases are separate.
+
+Atlas v2 exposes /mcp with Site-authenticated identity and five tools. Shared schemas/storage live in lib/atlas-*.ts. New fields are optional for legacy cards. User context lives in atlas_contexts, and entries.url_key has an owner-scoped uniqueness index. Apply only pending migrations; existing migrations are immutable. Update skills/atlas-knowledge and regenerate public/atlas-knowledge.zip when changing the tool contract. Seed records now also include app/new-resources.ts. MCP requests must never take owner identity from tool arguments.

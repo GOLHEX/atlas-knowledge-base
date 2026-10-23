@@ -1,8 +1,11 @@
 import { additional } from './additional';
+import { newResources } from './new-resources';
 export type Entry = {
  id:string; name:string; url:string; type:string; category:string; summary:string; tags:string[];
  use:string; needs:string; limits:string; start:string; platform:string; cost:string; license:string; checked:string;
  sources:{label:string;url:string}[]; notes:string; status:string; favorite:boolean; revision:number;
+ relevance?: {horizon:'Сейчас'|'Скоро'|'На будущее'|'Прототип';project:string;reason:string};
+ addedBy?:string; addedAt?:string;
 };
 const defaults = {notes:'',status:'В коллекции',favorite:false,revision:0,checked:'2026-10-22',license:'MIT'};
 export const seed: Entry[] = [
@@ -19,4 +22,5 @@ export const seed: Entry[] = [
  start:'Установка из README:\nnpx skills add ScrapeCreators/social-media-research-skills\n\nНастрой SCRAPECREATORS_API_KEY в окружении агента.\nПример задачи: сравни пять конкурентов в TikTok и Instagram; покажи работающие темы и форматы со ссылками на источники.',platform:'Codex / Claude Code / Cursor и другие',cost:'Навыки MIT; API ScrapeCreators и агент оплачиваются отдельно',sources:[{label:'README и список навыков',url:'https://github.com/ScrapeCreators/social-media-research-skills'},{label:'Документация API',url:'https://docs.scrapecreators.com'}]},
  {...defaults,id:'inkarnate',license:'Условия онлайн-сервиса',name:'Inkarnate',url:'https://inkarnate.com/',type:'Онлайн-сервис',category:'Карты и миры',summary:'Визуальный редактор фэнтези-карт: миры, локации и карты для настольных игр.',tags:['карты','фэнтези','D&D','worldbuilding','maps','karty','днд'],use:'Собрать карту мира или игровой локации в браузере: текстуры, объекты, линии, формы и редактируемые карты сообщества.',needs:'Браузер и аккаунт сервиса. Установка в WSL не требуется.',limits:'Это онлайн-сервис. Наличие API или интеграции с агентами не подтверждено. Экспорт и коммерческое использование зависят от тарифа — сверяй условия перед использованием.',start:'Открой inkarnate.com → Try the Editor Free.\nСоздай карту или выбери карту сообщества для клонирования.\nНастрой ландшафт, объекты и подписи, затем экспортируй результат.',platform:'В браузере',cost:'Есть бесплатный вариант и платные планы',sources:[{label:'Официальный сайт и FAQ',url:'https://inkarnate.com/'}]},
  ...additional,
+ ...newResources,
 ];

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Атлас инструментов"
+  short_description: "Подбор инструментов и пополнение рабочей базы знаний"
+  default_prompt: "Используй $atlas-knowledge: найди подходящие ресурсы для моей задачи и сохрани полезные находки с источниками и объяснением релевантности."
+policy:
+  allow_implicit_invocation: true
