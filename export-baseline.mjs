@@ -10,5 +10,6 @@ md+='## Как пользоваться\n\nИщи по названию, зад�
 for(const e of seed){md+=`## ${e.name}\n\n**${e.type} · ${e.category}**\n\n${e.summary}\n\n**Когда использовать:** ${e.use}\n\n**Нужно:** ${e.needs}\n\n**Среда:** ${e.platform}\n\n**Стоимость:** ${e.cost}\n\n**Ограничения:** ${e.limits}\n\n### Как начать\n\n\`\`\`text\n${e.start}\n\`\`\`\n\n**Источники:** ${e.sources.map(s=>`[${s.label}](${s.url})`).join(', ')}\n\n`;}
 md+='## Предлагаемый процесс\n\n1. Social Media Research Skills — исследование аудитории и конкурентов.\n2. YouTube Agent Skill — сценарий, заголовок и обложка.\n3. MoneyPrinterTurbo — сборка видео.\n4. Cheat on Content — прогнозы и разбор фактических результатов.\n\nЭто организационная схема; готовая автоматическая интеграция между этими проектами не проверена. Hermes — отдельная среда агента, Inkarnate — редактор карт.\n';
 fs.writeFileSync('../outputs/atlas-knowledge.md',md);
-console.log('Baseline exported: 11 entries, JSON + Markdown.');
+console.log('Baseline exported: ' + seed.length + ' entries, JSON + Markdown.');
+
 
